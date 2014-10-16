@@ -1,5 +1,5 @@
 /* Load IA */
-:-consult('ia_antho').
+:-consult('ia_antho2').
 
 :-dynamic firstPlayer/1.  /* FirstPlayer */
 
