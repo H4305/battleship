@@ -66,3 +66,6 @@ potentialShot(Joueur, Potential) :- write(oui), retract(hitShip(Joueur, Reussi, 
 	[coord(X,Y) |_] = Reussi, 
 	getCross(X,Y,Potential),
 	assertz(hitShip(Joueur, Reussi, Potential, 0)).
+	
+	
+computeCoordinate(Joueur, X, Y) :- PotentialShot(Joueur, Potential), [coord(X,Y) | Potential] = Potential , not(shots(Joueur, X, Y, _)) 
