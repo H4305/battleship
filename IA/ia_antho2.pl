@@ -36,8 +36,6 @@ getCross(X,1, List)   :- X2 is X+1, Y1 is Y-1, Y2 is Y +1, List =  [coord(X2, Y)
 getCross(X,10, List)  :- X1 is X-1, X2 is X+1, Y1 is Y-1,  List =  [coord(X1, Y), coord(X2, Y), coord(X, Y1)].
 
 
-
-
 /*
  * Return the 3 cases in each direction where the ship would be
  */
@@ -68,4 +66,4 @@ potentialShot(Joueur, Potential) :- write(oui), retract(hitShip(Joueur, Reussi, 
 	assertz(hitShip(Joueur, Reussi, Potential, 0)).
 	
 	
-computeCoordinate(Joueur, X, Y) :- PotentialShot(Joueur, Potential), [coord(X,Y) | Potential] = Potential , not(shots(Joueur, X, Y, _)) 
+computeCoordinate(Joueur, X, Y) :- PotentialShot(Joueur, Potential), [coord(X,Y) | Potential] = Potential , not(shots(Joueur, X, Y, _)).
