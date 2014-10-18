@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Bataille Navale</title>
+  <link rel="stylesheet" href="style/normalize.css">
+  <link rel="stylesheet" href="style/main.css">
+</head>
+<body>
+  <h1>Bataille Navale</h1>
+  <h2>Joueur {{nomJoueur}}</h2>
+
+  <div id="boatboard" class="boatboard">
+    <img src="img/shot.png" alt="" class="shot">
+  </div>
+  <table id="boats-table" colspace="0">
+    <tr>
+      <th></th>
+      <th>A</th>
+      <th>B</th>
+      <th>C</th>
+      <th>D</th>
+      <th>E</th>
+      <th>F</th>
+      <th>G</th>
+      <th>H</th>
+      <th>I</th>
+      <th>J</th>
+    </tr>
+  </table>
+  
+  <div id="boatlist" class="boatlist"></div>
+  <script>
+    var boatsTable = document.getElementById("boats-table");
+    var boatlist = document.getElementById("boatlist");
+    var boatboard = document.getElementById("boatboard");
+
+    var boats = {
+      aircraft: {
+        size: 5
+      },
+      battleship: {
+        size: 4
+      },
+      destroyer: {
+        size: 3
+      },
+      submarine: {
+        size: 3
+      },
+      patrol: {
+        size: 2
+      },
+      forEach: function(callback) {
+        for(b in boats) {
+          if(boats.hasOwnProperty(b) && typeof(boats[b]) != "function")
+            callback(b, boats[b]);
+        }
+      }
+    };
+
+    for(var r=1;r<11;r++) {
+      var row = document.createElement('tr');
+      var rowId = document.createElement('th');
+      rowId.textContent = r;
+      row.appendChild(rowId);
+      for(var c=1;c<11;c++) {
+        var cell = document.createElement('td');
+        cell.id = c+'x'+r;
+        cell.dataset.X = c;
+        cell.dataset.Y = r;
+        row.appendChild(cell);
+      }
+      boatsTable.appendChild(row);
+    }
+
+
+    boats.forEach(function(name, obj) {
+      var boat = document.createElement('img');
+      boat.src = "img/"+name+".png";
+      boat.id = name;
+      boat.draggable = true;
+      boat.classList.add("boat");
+      boatlist.appendChild(boat);
+      obj.direction = "vertical";
+      obj.elem = boat;
+
+      boat.addEventListener('dragstart', function (e) {
+        drag(e);
+      });
+
+      boat.addEventListener('dblclick', function(e) {
+        rotateBoat(e.target);
+      })
+    });
+
+    boatsTable.addEventListener('dragover', function(e) {
+      allowDrop(e);
+    });
+
+    boatsTable.addEventListener('drop', function(e) {
+      e.preventDefault();
+      if(e.target.tagName == "TD")
+        drop(e);
+    });
+
+    var movingBoat;
+    var cellOffset = 0;
+
+    function allowDrop(ev) {
+        ev.preventDefault();
+    }
+
+    const CELLSIZE = 32;
+    function drag(ev) {
+        movingBoat = ev.target.id;
+        var layer = boats[ev.target.id].direction == "vertical"?ev.layerY:ev.layerX;
+        cellOffset = Math.floor(layer/CELLSIZE);
+    }
+
+    function drop(ev) {
+        ev.preventDefault();
+        var boat = document.getElementById(movingBoat);
+        var boatObj = boats[boat.id];
+        var target = ev.target;
+        var targetX = parseInt(target.dataset.X);
+        var targetY = parseInt(target.dataset.Y);
+
+        if(boatObj.direction == "horizontal" && targetX + boatObj.size > 11) {
+          target = document.getElementById((11-boatObj.size)+"x"+targetY);
+          cellOffset = 0;
+        }
+        if(boatObj.direction == "vertical" && targetY + boatObj.size > 11) {
+          target = document.getElementById(targetX+"x"+(11-boatObj.size));
+          cellOffset = 0;
+        }
+/*
+        if(boatObj.direction == "vertical") {
+          boats.forEach(function (b) {
+            if(b.X == boatObj.X && (b.Y >= boatObj.Y && b.Y <= boatObj))
+          });
+        }
+*/
+        if(cellOffset) {
+          if(boatObj.direction == "vertical") {
+            targetY = targetY-cellOffset;
+          } else {
+            targetX = targetX-cellOffset;
+          }
+          target = document.getElementById(targetX+"x"+targetY);
+        }
+
+        target.appendChild(boat);
+        boats[boat.id].X = parseInt(ev.target.dataset.X);
+        boats[boat.id].Y = parseInt(ev.target.dataset.Y);
+    }
+
+    function rotateBoat(boat) {
+      var boatObj = boats[boat.id];
+      if(boatObj.direction == "horizontal") {
+        boat.classList.remove("horizontal");
+        boatObj.direction = "vertical";
+        if(boatObj.Y + boatObj.size > 11) {
+          boatObj.Y = 11-boatObj.size;
+          document.getElementById(boatObj.X+"x"+boatObj.Y).appendChild(boat);
+        }
+      } else {
+        boat.classList.add("horizontal");
+        boatObj.direction = "horizontal";
+        if(boatObj.X + boatObj.size > 11) {
+          boatObj.X = 11-boatObj.size;
+          document.getElementById(boatObj.X+"x"+boatObj.Y).appendChild(boat);
+        }
+      }
+    }
+
+  </script>
+</body>
+</html>
