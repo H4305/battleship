@@ -9,16 +9,8 @@ shots(joueur1, 1, 7, 0).
 shots(joueur1, 1, 8, 0).
 shots(joueur1, 1, 9, 0).
 shots(joueur1, 1, 10, 0).
-shots(joueur1, 2, 1, 0).
-shots(joueur1, 2, 2, 0).
-shots(joueur1, 2, 3, 0).
-shots(joueur1, 2, 4, 0).
 shots(joueur1, 2, 5, 0).
 shots(joueur1, 2, 6, 1).
-shots(joueur1, 2, 7, 1).
-shots(joueur1, 2, 8, 1).
-shots(joueur1, 2, 9, 1).
-shots(joueur1, 2, 10, 0).
 shots(joueur1, 3, 1, 0).
 
 :- dynamic hitShip/4.
@@ -50,20 +42,22 @@ getLine(Reussi, Potential) :- write(bbbb), [coord(X1, Y1) | [ coord(X2, Y2) | _]
 	Potential = [coord(X11, Y1), coord(X12, Y1), coord(X13, Y1), coord(X21, Y1), coord(X22, Y1), coord(X23, Y1)].
 
 	
-potentialShot(Joueur, Potential) :- write(non), retract(hitShip(Joueur, Reussi, _, 0)), 
+potentialShot(Joueur, Potential) :- write(non), hitShip(Joueur, Reussi, _, 0), 
 	length(Reussi, Length),
 	Length > 1,
 	[coord(X,Y) |_] = Reussi, 
 	getLine(Reussi, Potential),
+	retract(hitShip(Joueur, Reussi, _, 0)),
 	assertz(hitShip(Joueur, Reussi, Potential, 0)).
 	
 	
 /* Si liste de hitShip == 1 alors on n'a pas la direction, on met a jour la liste des coups potentitials avec les 4 cases autours du coup precedemment reussi */
-potentialShot(Joueur, Potential) :- write(oui), retract(hitShip(Joueur, Reussi, _, 0)), 
+potentialShot(Joueur, Potential) :- write(oui), hitShip(Joueur, Reussi, _, 0), 
 	length(Reussi, 1),
 	[coord(X,Y) |_] = Reussi, 
 	getCross(X,Y,Potential),
+	retract(hitShip(Joueur, Reussi, _, 0)),
 	assertz(hitShip(Joueur, Reussi, Potential, 0)).
 	
 	
-computeCoordinate(Joueur, X, Y) :- PotentialShot(Joueur, Potential), [coord(X,Y) | Potential] = Potential , not(shots(Joueur, X, Y, _)).
+computeCoordinate(Joueur, X, Y) :- potentialShot(Joueur, Potential), [coord(X,Y) | Potential] = Potential.
