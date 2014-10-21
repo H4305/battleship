@@ -6,7 +6,7 @@ for(var i = 0; i<10;i++) {
   terms[i] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 }
 
-var args = ['-s', 'poseBateaux.pl', '-g', 'placeShipsAuto('+j1+').'];
+var args = ['-s', '../pose/poseBateaux.pl', '-g', 'placeShipsAuto('+j1+').'];
 
 var terminal = require('child_process').spawn('/Applications/SWI-Prolog.app/Contents/MacOS/swipl', args);
 
