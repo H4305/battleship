@@ -17,9 +17,11 @@ shots(joueur1, 3, 1, 0).
 shots(joueur1, 2, 8, 1).
 shots(joueur1, 2, 9, 0).
 shots(joueur1, 2, 10, 0).
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 :- dynamic hitShip/4.
-
-
 hitShip(joueur1, [coord(2,7), coord(2,5), coord(2,8), coord(2,6)], [] ,0).
 
 
