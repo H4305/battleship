@@ -15,9 +15,13 @@ shots(joueur1, 2, 7, 1).
 shots(joueur1, 3, 1, 0).
 
 shots(joueur1, 2, 8, 1).
-shots(joueur1, 2, 9, 1).
+shots(joueur1, 2, 9, 0).
+shots(joueur1, 2, 10, 0).
 :- dynamic hitShip/4.
-hitShip(joueur1, [coord(2,7), coord(2,5), coord(2,6)], [] ,0).
+
+
+hitShip(joueur1, [coord(2,7), coord(2,5), coord(2,8), coord(2,6)], [] ,0).
+
 
 displaySuccessfulShots(Joueur, X, Y) :- shots(Joueur, X, Y, 1), write([Joueur, X, Y]), nl, fail.
 
@@ -67,14 +71,14 @@ randomlyplay(Joueur, X, Y) :- random(1, 11, X), random(1, 11, Y), not(shots(Joue
 	
 computeCoordinate(Joueur, X, Y) :- potentialShot(Joueur, Potential), findShot(Joueur, Potential, X, Y), !.
 
-findShot(Joueur, [coord(A,B)|T], X, Y) :- 
-	shots(Joueur, A, B, _), 
-	write(A), nl, write(B), nl, write(T),nl,
-	findShot(Joueur, T, X, Y),!.
-	
 findShot(Joueur, [coord(X,Y)|T], X, Y) :- 
 	not(shots(Joueur, X, Y, _)),!.
+
+findShot(Joueur, [coord(A,B)|T], X, Y) :- 
+	shots(Joueur, A, B, _), 
+	%write(A), nl, write(B), nl, write(T),nl,
+	findShot(Joueur, T, X, Y),!.
 	
-findShot(Joueur, [coord(X,Y)], X, Y) :- write(end), write(X).
+%findShot(Joueur, [coord(X,Y)], X, Y) :- write(end), write(X).
 
 getFirstElement([H|T], H).
