@@ -14,6 +14,8 @@ shots(joueur1, 2, 6, 1).
 shots(joueur1, 2, 7, 1).
 shots(joueur1, 3, 1, 0).
 
+shots(joueur1, 2, 8, 1).
+shots(joueur1, 2, 9, 1).
 :- dynamic hitShip/4.
 hitShip(joueur1, [coord(2,7), coord(2,5), coord(2,6)], [] ,0).
 
@@ -28,7 +30,6 @@ getCross(10,Y, List)  :- X1 is X-1, X2 is X+1, Y1 is Y-1,  List =  [coord(X1, Y)
 getCross(X,1, List)   :- X2 is X+1, Y1 is Y-1, Y2 is Y +1, List =  [coord(X2, Y), coord(X, Y1), coord(X, Y2)].
 getCross(X,10, List)  :- X1 is X-1, X2 is X+1, Y1 is Y-1,  List =  [coord(X1, Y), coord(X2, Y), coord(X, Y1)].
 
-
 /*
  * Return the 3 cases in each direction where the ship would be
  */
@@ -42,7 +43,6 @@ getLine(Reussi, Potential) :- [coord(X1, Y1) | [ coord(X2, Y2) | _]] = Reussi, Y
 	X20 is min(X1,X2), X21 is X20 - 1, X22 is X20 - 2, X23 is X20 - 3,
 	Potential = [coord(X11, Y1), coord(X12, Y1), coord(X13, Y1), coord(X21, Y1), coord(X22, Y1), coord(X23, Y1)].
 
-	
 potentialShot(Joueur, Potential) :- hitShip(Joueur, Reussi, _, 0), 
 	length(Reussi, Length),
 	Length > 1,
@@ -50,7 +50,6 @@ potentialShot(Joueur, Potential) :- hitShip(Joueur, Reussi, _, 0),
 	getLine(Reussi, Potential),
 	retract(hitShip(Joueur, Reussi, _, 0)),
 	assertz(hitShip(Joueur, Reussi, Potential, 0)).
-	
 	
 /* Si liste de hitShip == 1 alors on n'a pas la direction, on met a jour la liste des coups potentitials avec les 4 cases autours du coup precedemment reussi */
 potentialShot(Joueur, Potential) :- hitShip(Joueur, Reussi, _, 0), 
@@ -60,9 +59,22 @@ potentialShot(Joueur, Potential) :- hitShip(Joueur, Reussi, _, 0),
 	retract(hitShip(Joueur, Reussi, _, 0)),
 	assertz(hitShip(Joueur, Reussi, Potential, 0)).
 	
+potentialShot(Joueur, Potential) :- not(hitShip(Joueur, Reussi, _, 0)),
+	randomlyplay(Joueur, X, Y),
+	Potential = [coord(X,Y)].
+
+randomlyplay(Joueur, X, Y) :- random(1, 11, X), random(1, 11, Y), not(shots(Joueur, X, Y, _)) -> true; randomlyplay(Joueur, X, Y).	
 	
-computeCoordinate(Joueur, X, Y) :- potentialShot(Joueur, Potential), getFirstElement(Potential, coord(X,Y)), not(shots(Joueur, X, Y, _)),!.
+computeCoordinate(Joueur, X, Y) :- potentialShot(Joueur, Potential), findShot(Joueur, Potential, X, Y), !.
 
-
+findShot(Joueur, [coord(A,B)|T], X, Y) :- 
+	shots(Joueur, A, B, _), 
+	write(A), nl, write(B), nl, write(T),nl,
+	findShot(Joueur, T, X, Y),!.
+	
+findShot(Joueur, [coord(X,Y)|T], X, Y) :- 
+	not(shots(Joueur, X, Y, _)),!.
+	
+findShot(Joueur, [coord(X,Y)], X, Y) :- write(end), write(X).
 
 getFirstElement([H|T], H).
