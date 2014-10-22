@@ -1,4 +1,4 @@
-
+/*
 shots(joueur1, 1, 1, 0).
 shots(joueur1, 1, 2, 0).
 shots(joueur1, 1, 3, 0).
@@ -13,14 +13,16 @@ shots(joueur1, 2, 5, 0).
 shots(joueur1, 2, 6, 1).
 shots(joueur1, 2, 7, 1).
 shots(joueur1, 3, 1, 0).
-
 shots(joueur1, 2, 8, 1).
 shots(joueur1, 2, 9, 0).
-shots(joueur1, 2, 10, 0).
+shots(joueur1, 2, 10, 0). */
+
+
 
 
 :- dynamic hitShip/4.
-hitShip(joueur1, [coord(2,7), coord(2,5), coord(2,8), coord(2,6)], [] ,0).
+:- dynamic shots/4.
+shots(JOUEURTEST, 0,0,0).
 
 displaySuccessfulShots(Joueur, X, Y) :- shots(Joueur, X, Y, 1), write([Joueur, X, Y]), nl, fail.
 
@@ -32,6 +34,7 @@ getCross(1,Y, List)   :- X1 is X-1, X2 is X+1, Y2 is Y +1, List =  [coord(X1, Y)
 getCross(10,Y, List)  :- X1 is X-1, X2 is X+1, Y1 is Y-1,  List =  [coord(X1, Y), coord(X2, Y), coord(X, Y1)].
 getCross(X,1, List)   :- X2 is X+1, Y1 is Y-1, Y2 is Y +1, List =  [coord(X2, Y), coord(X, Y1), coord(X, Y2)].
 getCross(X,10, List)  :- X1 is X-1, X2 is X+1, Y1 is Y-1,  List =  [coord(X1, Y), coord(X2, Y), coord(X, Y1)].
+getCross(X,Y, List)   :- X1 is X-1, X2 is X+1, Y1 is Y-1, Y2 is Y+1, List =  [coord(X1, Y), coord(X2, Y), coord(X, Y1), coord(X,Y2)].
 
 /*
  * Return the 3 cases in each direction where the ship would be
@@ -69,7 +72,10 @@ potentialShot(Joueur, Potential) :-
 potentialShot(Joueur, Potential) :- 
 	not(hitShip(Joueur, Reussi, _, 0)),
 	randomlyplay(Joueur, X, Y),
-	Potential = [coord(X,Y)].
+	Potential = [coord(X, Y)].
+	
+	%retract(hitShip(Joueur, Reussi, _, 0)),
+	%assertz(hitShip(Joueur, Reussi, [coord(X,Y)], 0)).
 
 randomlyplay(Joueur, X, Y) :-
 	random(1, 11, X), random(1, 11, Y),
@@ -81,10 +87,25 @@ computeCoordinate(Joueur, X, Y) :-
 	findShot(Joueur, Potential, X, Y),
 	!.
 
-findShot(Joueur, [coord(X,Y)|T], X, Y) :- 
-	not(shots(Joueur, X, Y, _)),!.
-
+	
 findShot(Joueur, [coord(A,B)|T], X, Y) :- 
 	shots(Joueur, A, B, _), 
 	findShot(Joueur, T, X, Y),!.
+
+findShot(Joueur, [coord(X,Y)|T], X, Y) :- 
+	not(shots(Joueur, X, Y, _)),!.
+
+
+	
+state(Joueur, X, Y, Sunk) :- 
+	hitShip(Joueur, Success, P, 0),
+	append([coord(X,Y)],Success, NewSuccess),
+	retract(hitShip(Joueur, Success, P, 0)),
+	assertz(hitShip(Joueur,NewSuccess, P, Sunk)).
+	
+state(Joueur, X, Y, Sunk) :- 
+	not(hitShip(Joueur, R, P, 0)),
+	assertz(hitShip(Joueur,[coord(X,Y)], P, Sunk)).
+	
+playIA(Joueur, X, Y) :- computeCoordinate(Joueur,X,Y).
 	
