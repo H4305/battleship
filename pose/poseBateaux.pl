@@ -27,30 +27,58 @@ placeShipsAuto(Joueur) :- ship(IdShip, Taille), placeShipAuto(Joueur, IdShip, Ta
 placeShipsAuto :- joueur(Joueur), ship(IdShip, Taille), placeShipAuto(Joueur, IdShip, Taille), fail.
 placeShipsAuto :- !.
 
-placeShipAuto(Joueur, IdShip, Taille):- randomCase(Taille, Direction, X, Y), checkCase(Taille,Direction, X, Y, Joueur) -> 
+placeShipAuto(Joueur, IdShip, Taille):- randomCase(Taille, Direction, X, Y), 
+NewTaille is +(Taille,2), NewX is -(X, -(1, *(1, Direction))), NewY is -(Y, Direction), 
+checkPosition(NewTaille, Direction, NewX, NewY, Joueur) ->
 assertShip(IdShip, Taille, Direction, X, Y, Joueur); placeShipAuto(Joueur, IdShip, Taille).
 
 randomCase(Taille, Direction, X, Y) :- random(0,2, Direction), randomCoord(Taille, Direction, X, Y).
 
 randomCoord(Taille, 0, X, Y) :- 
-MaxX is -(12,Taille), MaxY is 10,
-random(1,MaxX,X), random(1,MaxY,Y).
+MaxX is -(11,Taille), MaxY is 9,
+random(2,MaxX,X), random(2,MaxY,Y).
 
 randomCoord(Taille, 1, X, Y) :-
-MaxX is 10, MaxY is -(12,Taille),
-random(1,MaxX,X), random(1,MaxY,Y).
+MaxX is 9, MaxY is -(11,Taille),
+random(2,MaxX,X), random(2,MaxY,Y).
 
-checkCase(0, _, _, _, _):-!.
-checkCase(Taille, Direction, X, Y, Joueur):- 
+checkPosition(NewTaille, 0, X, Y, Joueur):-
+Yplus is Y+1, Yless is Y-1,
+checkCase(NewTaille, 0, X, Yless, Joueur),
+checkCase(NewTaille, 0, X, Y, Joueur),
+checkCase(NewTaille, 0, X, Yplus, Joueur).
+
+checkPosition(NewTaille, 1, X, Y, Joueur):-
+Xplus is X+1, Xless is X-1,
+checkCase(NewTaille, 1, Xless, Y, Joueur),
+checkCase(NewTaille, 1, X, Y, Joueur),
+checkCase(NewTaille, 1, Xplus, Y, Joueur).
+
+checkCase(0, _, _, _, _):- !.
+
+checkCase(Taille, 0, X, Y, Joueur):-
+writeln(Y),
 not(case(Joueur, X, Y, _, _)),
-NewTaille is -(Taille,1), NewX is +(X, -(1, *(1, Direction))), NewY is +(Y, Direction),
-checkCase(NewTaille, Direction, NewX, NewY, Joueur).
+NewTaille is -(Taille,1), NewX is +(X, 1),
+checkCase(NewTaille, 0, NewX, Y, Joueur).
+
+checkCase(Taille, 1, X, Y, Joueur):-
+not(case(Joueur, X, Y, _, _)),
+NewTaille is -(Taille,1), NewY is +(Y, 1),
+checkCase(NewTaille, 1, X, NewY, Joueur).
+
 
 assertShip(_, 0, _, _, _, _):- !.
-assertShip(IdShip, Taille, Direction, X, Y, Joueur):-
-NewTaille is -(Taille,1), NewX is +(X, -(1, *(1, Direction))), NewY is +(Y, Direction), 
+assertShip(IdShip, Taille, 0, X, Y, Joueur):-
+NewTaille is -(Taille,1), NewX is +(X, 1),
 assertz(case(Joueur, X, Y, 0, IdShip)),
-assertShip(IdShip, NewTaille, Direction, NewX, NewY, Joueur).
+assertShip(IdShip, NewTaille, 0, NewX, Y, Joueur).
+
+assertShip(IdShip, Taille, 1, X, Y, Joueur):-
+NewTaille is -(Taille,1), NewY is +(Y, 1),
+assertz(case(Joueur, X, Y, 0, IdShip)),
+assertShip(IdShip, NewTaille, 1, X, NewY, Joueur).
+
 
 displayGrid(Joueur) :- case(Joueur,X,Y,T,ID), writeln([X, Y, T, '"',ID, '"']), fail.
 
