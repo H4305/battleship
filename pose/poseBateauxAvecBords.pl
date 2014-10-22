@@ -11,7 +11,7 @@ joueur(maria).
 :-dynamic case/5.
 
 :-dynamic ship/2.
-ship(aircraft, 5).
+ship(aircraft, 4).
 ship(battleship, 4).
 ship(submarine, 3).
 ship(destroyer, 3).
@@ -34,13 +34,13 @@ assertShip(IdShip, Taille, Direction, X, Y, Joueur); placeShipAuto(Joueur, IdShi
 
 randomCase(Taille, Direction, X, Y) :- random(0,2, Direction), randomCoord(Taille, Direction, X, Y).
 
-randomCoord(Taille, 0, X, Y) :-
-MaxX is -(11,Taille), MaxY is 10,
-random(2,MaxX,X), random(2,MaxY,Y).
+randomCoord(Taille, 0, X, Y) :- 
+MaxX is -(12,Taille), MaxY is 11,
+random(1,MaxX,X), random(1,MaxY,Y).
 
 randomCoord(Taille, 1, X, Y) :-
-MaxX is 10, MaxY is -(11,Taille),
-random(2,MaxX,X), random(2,MaxY,Y).
+MaxX is 11, MaxY is -(12,Taille),
+random(1,MaxX,X), random(1,MaxY,Y).
 
 checkPosition(NewTaille, 0, X, Y, Joueur):-
 Yplus is Y+1, Yless is Y-1,
