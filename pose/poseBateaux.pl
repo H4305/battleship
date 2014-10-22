@@ -11,7 +11,7 @@ joueur(maria).
 :-dynamic case/5.
 
 :-dynamic ship/2.
-ship(aircraft, 5).
+ship(aircraft, 4).
 ship(battleship, 4).
 ship(submarine, 3).
 ship(destroyer, 3).
@@ -27,8 +27,8 @@ placeShipsAuto(Joueur) :- ship(IdShip, Taille), placeShipAuto(Joueur, IdShip, Ta
 placeShipsAuto :- joueur(Joueur), ship(IdShip, Taille), placeShipAuto(Joueur, IdShip, Taille), fail.
 placeShipsAuto :- !.
 
-placeShipAuto(Joueur, IdShip, Taille):- repeat, randomCase(Taille, Direction, X, Y),
-assertShip(IdShip, Taille, Direction, X, Y, Joueur), not(checkCase(Taille,Direction, X, Y, Joueur)),!.
+placeShipAuto(Joueur, IdShip, Taille):- randomCase(Taille, Direction, X, Y), checkCase(Taille,Direction, X, Y, Joueur) -> 
+assertShip(IdShip, Taille, Direction, X, Y, Joueur); placeShipAuto(Joueur, IdShip, Taille).
 
 randomCase(Taille, Direction, X, Y) :- random(0,2, Direction), randomCoord(Taille, Direction, X, Y).
 
@@ -40,7 +40,7 @@ randomCoord(Taille, 1, X, Y) :-
 MaxX is 10, MaxY is -(12,Taille),
 random(1,MaxX,X), random(1,MaxY,Y).
 
-checkCase(0, _, _, _, _):- !.
+checkCase(0, _, _, _, _):-!.
 checkCase(Taille, Direction, X, Y, Joueur):- 
 not(case(Joueur, X, Y, _, _)),
 NewTaille is -(Taille,1), NewX is +(X, -(1, *(1, Direction))), NewY is +(Y, Direction),
@@ -53,8 +53,9 @@ assertz(case(Joueur, X, Y, 0, IdShip)),
 assertShip(IdShip, NewTaille, Direction, NewX, NewY, Joueur).
 
 displayGrid(Joueur) :- case(Joueur,X,Y,T,ID), writeln([X, Y, T, '"',ID, '"']), fail.
-displayGrid(Joueur) :- writeln('end');
 
-displayGame :- joueur(Joueur), write(Joueur), nl,displayGrid(Joueur),nl.
+displayPlayer(Joueur) :- not(displayGrid(Joueur)), write('end').
+
+displayGame :- joueur(Joueur), write(Joueur), nl,displayGrid(Joueur), nl.
 
 go :- placeShipsAuto, displayGame.
