@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Bataille Navale</title>
+  <link rel="stylesheet" href="style/normalize.css">
+  <link rel="stylesheet" href="style/main.css">
+</head>
+<body>
+  <h1>Bataille Navale</h1>
+  <h2>Joueur: {{nomJoueur}}</h2>
+<div class="controllers">
+  <button id="start">Start</button>
+</div>
+  <div id="boatboard" class="boatboard">
+    <img src="img/shot.png" alt="" class="shot">
+  </div>
+  <table id="boats-table" colspace="0">
+    <tr>
+      <th></th>
+      <th>A</th>
+      <th>B</th>
+      <th>C</th>
+      <th>D</th>
+      <th>E</th>
+      <th>F</th>
+      <th>G</th>
+      <th>H</th>
+      <th>I</th>
+      <th>J</th>
+    </tr>
+  </table>
+  <div id="boatlist" class="boatlist"></div>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    var boatsTable = document.getElementById("boats-table");
+    var boatlist = document.getElementById("boatlist");
+    var boatboard = document.getElementById("boatboard");
+    var startBtn = document.getElementById("start");
+
+    var socket = io.connect('http://localhost:3000');
+    socket.on('news', function (data) {
+      console.log(data);
+      socket.emit('my other event', { my: 'data' });
+    });
+
+    startBtn.addEventListener('click', function(event) {
+      console.log("piwww");
+      socket.emit('gogogo');
+    });
+
+    var boats = {
+      aircraft: {
+        size: 5
+      },
+      battleship: {
+        size: 4
+      },
+      destroyer: {
+        size: 3
+      },
+      submarine: {
+        size: 3
+      },
+      patrol: {
+        size: 2
+      },
+      forEach: function(callback) {
+        for(b in boats) {
+          if(boats.hasOwnProperty(b) && typeof(boats[b]) != "function")
+            callback(b, boats[b]);
+        }
+      }
+    };
+
+    var cases = [];
+    for(var i = 0; i<10;i++) {
+      cases[i] = ['', '', '', '', '', '', '', '', '', ''];
+    }
+
+    for(var r=1;r<11;r++) {
+      var row = document.createElement('tr');
+      var rowId = document.createElement('th');
+      rowId.textContent = r;
+      row.appendChild(rowId);
+      for(var c=1;c<11;c++) {
+        var cell = document.createElement('td');
+        cell.id = c+'x'+r;
+        cell.dataset.X = c;
+        cell.dataset.Y = r;
+        row.appendChild(cell);
+      }
+      boatsTable.appendChild(row);
+    }
+
+
+    boats.forEach(function(name, obj) {
+      var boat = document.createElement('img');
+      boat.src = "img/"+name+".png";
+      boat.id = name;
+      boat.draggable = true;
+      boat.classList.add("boat");
+      boatlist.appendChild(boat);
+      obj.direction = "vertical";
+      obj.elem = boat;
+
+      boat.addEventListener('dragstart', function (e) {
+        drag(e);
+      });
+
+      boat.addEventListener('dblclick', function(e) {
+        rotateBoat(e.target);
+      })
+    });
+
+    boatsTable.addEventListener('dragover', function(e) {
+      allowDrop(e);
+    });
+
+    boatsTable.addEventListener('drop', function(e) {
+      e.preventDefault();
+      if(e.target.tagName == "TD")
+        drop(e);
+    });
+
+    var movingBoat;
+    var cellOffset = 0;
+
+    function allowDrop(ev) {
+        ev.preventDefault();
+    }
+
+    const CELLSIZE = 32;
+    function drag(ev) {
+        movingBoat = ev.target.id;
+        var layer = boats[ev.target.id].direction == "vertical"?ev.layerY:ev.layerX;
+        cellOffset = Math.floor(layer/CELLSIZE);
+    }
+
+    function drop(ev) {
+        ev.preventDefault();
+        var boat = document.getElementById(movingBoat);
+        var boatObj = boats[boat.id];
+        var target = ev.target;
+        var targetX = parseInt(target.dataset.X);
+        var targetY = parseInt(target.dataset.Y);
+
+        if(boatObj.direction == "horizontal" && targetX + boatObj.size > 11) {
+          target = document.getElementById((11-boatObj.size)+"x"+targetY);
+          cellOffset = 0;
+        }
+        if(boatObj.direction == "vertical" && targetY + boatObj.size > 11) {
+          target = document.getElementById(targetX+"x"+(11-boatObj.size));
+          cellOffset = 0;
+        }
+
+        if(cellOffset) {
+          if(boatObj.direction == "vertical") {
+            targetY = targetY-cellOffset;
+          } else {
+            targetX = targetX-cellOffset;
+          }
+          target = document.getElementById(targetX+"x"+targetY);
+        }
+
+        var X = targetX;
+        var Y = targetY;
+
+        if(!updateTable(boat.id, boatObj.direction, boatObj.size, X, Y)) {
+          return false;
+        }
+
+        target.appendChild(boat);
+        boats[boat.id].X = X;
+        boats[boat.id].Y = Y;
+    }
+
+    function updateTable(id, direction, size, X, Y) {
+      if(direction == "vertical") {
+        for(var i = Y-1; i < (Y-1+size); i++) {
+          if(cases[i][X-1] != ""  && cases[i][X-1] != id) {
+            return false;
+          }
+        }
+      } else {
+        for(var i = X-1; i < (X-1+size); i++) {
+          if(cases[Y-1][i] != "" && cases[Y-1][i] != id) {
+            return false;
+          }
+        }
+      }
+
+      for(var i=0; i<10; i++) {
+        for(var j=0; j<10; j++) {
+          if(cases[j][i] == id) {
+            cases[j][i] = "";
+          }
+        }
+      }
+
+      if(direction == "vertical") {
+        for(var i = Y-1; i < (Y+size-1); i++) {
+          cases[i][X-1] = id;
+        }
+      } else {
+        for(var i = X-1; i < (X+size-1); i++) {
+          cases[Y-1][i] = id;
+        }
+      }
+      return true;
+    }
+
+    function rotateBoat(boat) {
+      var boatObj = boats[boat.id];
+      var Y = boatObj.Y;
+      var X = boatObj.X;
+
+      if(boatObj.direction == "horizontal") {
+        boat.classList.remove("horizontal");
+        boatObj.direction = "vertical";
+
+        if(Y + boatObj.size > 11) {
+          Y = 11-boatObj.size;
+        }
+      } else {
+        boat.classList.add("horizontal");
+        boatObj.direction = "horizontal";
+
+        if(X + boatObj.size > 11) {
+          X = 11-boatObj.size;
+        }
+      }
+      if(!updateTable(boat.id, boatObj.direction, boatObj.size, X, Y)) {
+        boatObj.direction = (boatObj.direction == "horizontal") ? "vertical" : "horizontal";
+        if(boatObj.direction == "vertical")
+          boat.classList.remove("horizontal");
+        console.log("nope");
+        return false;
+      }
+      console.log("rotaaaate");
+      boatObj.X = X;
+      boatObj.Y = Y;
+      document.getElementById(X+"x"+Y).appendChild(boat);
+    }
+  </script>
+</body>
+</html>
