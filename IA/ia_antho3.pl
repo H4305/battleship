@@ -22,6 +22,8 @@ playGrid(Joueur, X, Y) :-
 	not(shots(Joueur, X, Y, _)) -> true; playGrid(Joueur, X, Y).
 
 
+/*If the list is empty, call IA1 for a random number .. ? because there are still available cases */
+
 /*
 Regle : 
 	- Conserver la taille du plus gros bateau restant
