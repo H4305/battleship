@@ -152,8 +152,8 @@ shot(X,Y) :- nl, currentPlayer(PlayerName), findOpponentPlayer(OpponentPlayer), 
 ( not(shots(PlayerName, X, Y, _)) -> ( ships(OpponentPlayer, X, Y, _, ShipName) -> addPositiveShot(PlayerName, OpponentPlayer, X, Y, ShipName), 
 displayPositiveShotMessage(X, Y), 
 ( sunken(OpponentPlayer, ShipName) -> displaySunkenBoatMessage(OpponentPlayer, ShipName), state(PlayerName, X, Y, 1), write('SHOT:'), write(PlayerName), write('.S.'), not(displayShipPosition(OpponentPlayer, ShipName)), nl, (testVictoryAgainst(OpponentPlayer) -> 
-	displayVictoryMessage(PlayerName), write('WON.'), write(PlayerName) ; nextPlay(PlayerName) ) ; state(PlayerName, X, Y, 0) , write('SHOT:'), write(PlayerName), write('.'), write([X,Y]), write('.T'), nl, nextPlay(PlayerName) ) ; assertz(shots(PlayerName, X, Y, water)), 
-write('Sorry! :( No boat  at coordinates '), write([X,Y]), nl, write('SHOT:'), write(PlayerName), write('.'), write([X,Y]), write('.W'), nl, affectCurrentPlayer(OpponentPlayer) , nextPlay(OpponentPlayer) ); 
+	 write('WON.'), write(PlayerName), displayVictoryMessage(PlayerName) ; nextPlay(PlayerName) ) ; state(PlayerName, X, Y, 0) , write('SHOT:'), write(PlayerName), write('.T.'), write([X,Y]), nl, nextPlay(PlayerName) ) ; assertz(shots(PlayerName, X, Y, water)), 
+write('Sorry! :( No boat  at coordinates '), write([X,Y]), nl, write('SHOT:'), write(PlayerName), write('.W.'), write([X,Y]), nl, affectCurrentPlayer(OpponentPlayer) , nextPlay(OpponentPlayer) ); 
 write('Already Bombed! Try other coordinates!'), nl , nextPlay(PlayerName) ).
 
 /* nextPlay(IAPlayer) : Tests if the next player is an IA and calls playIA(IAPlayer) */ 
