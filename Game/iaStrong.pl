@@ -23,26 +23,30 @@ getLine(Reussi, Potential) :-
 	Y10 is max(Y1,Y2), Y11 is Y10+1, Y12 is Y10+2, Y13 is Y10+3,
 	Y20 is min(Y1,Y2), Y21 is Y20-1, Y22 is Y20-2, Y23 is Y20-3,
 	TempPotential = [coord(X1, Y11), coord(X1, Y12), coord(X1, Y13), coord(X1, Y21), coord(X1, Y22), coord(X1, Y23)],
-	cleanPotentialLine(TempPotential, Potential).
+	clean(TempPotential, Potential).
 	
 getLine(Reussi, Potential) :- 
 	[coord(X1, Y1) | [ coord(X2, Y2) | _]] = Reussi, Y2 =:= Y1, 
 	X10 is max(X1,X2), X11 is X10+1, X12 is X10+2, X13 is X10+3,
 	X20 is min(X1,X2), X21 is X20-1, X22 is X20-2, X23 is X20-3,
 	TempPotential = [coord(X11, Y1), coord(X12, Y1), coord(X13, Y1), coord(X21, Y1), coord(X22, Y1), coord(X23, Y1)],
-	cleanPotentialLine(TempPotential, Potential).
+	clean(TempPotential, Potential).
 	
-cleanPotentialLine([], CleanedLine) :- !.
-cleanPotentialLine([coord(X,Y)|Tail], CleanedLine) :-
-	X > 0, X < 11, Y > 0, Y < 11, 
-	cleanPotentialLine(Tail,[coord(X,Y)|CleanedLine]), !.
+clean(Potential, Clean) :-
+	cleanPotentialLine(Potential,[],Clean), !.
+	
+	
+cleanPotentialLine([],CleanedLine,CleanedLine).
 
-cleanPotentialLine([coord(X,Y)|Tail], CleanedLine) :-
-	cleanPotentialLine(Tail, CleanedLine), !.
+cleanPotentialLine([coord(X,Y)|Tail], OldList, Cleaned) :-
+	X > 0, X < 11, Y > 0, Y < 11, 
+	append(OldList, [coord(X,Y)], NewList),
+	cleanPotentialLine(Tail,NewList,Cleaned).
+
+cleanPotentialLine([coord(X,Y)|Tail], OldList, Newlist) :-
+	cleanPotentialLine(Tail, OldList, Newlist).
 	
-	
-	
-	
+
 
 potentialShot(Player, Potential) :- 
 	hitShip(Player, Reussi, _, 0), 
