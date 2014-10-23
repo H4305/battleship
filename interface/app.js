@@ -18,6 +18,10 @@ resetTable(enemyBoats);
 
 //App
 
+app.route('/').get(function(req,res,next){
+  res.render('home');
+});
+
 app.route('/play/:username/:ia').get(function (req, res, next){
   res.render('play', {playerName: req.params.username, iaName: req.params.ia});
 });
@@ -100,7 +104,7 @@ terminal.stdout.on('data', function (data) {
       case 'SHOT':
         treatShot(msg);
         break;
-      case 'WIN':
+      case 'WON':
         victoryCondition(msg);
       default:
         console.log(line);

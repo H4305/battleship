@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Battleship</title>
+  <link rel="stylesheet" href="/style/normalize.css">
+  <link rel="stylesheet" href="/style/main.css">
+</head>
+<body>
+  <h1>Battleship</h1>
+  <input type="text" id="joueur">
+  <button id="easyIA">Easy IA</button>
+  <button id="strongIA">Strong IA</button>
+  <script>
+  document.getElementById("easyIA").addEventListener('click', function() {
+    window.location = "/play/"+joueur.value+"/easyIA";
+  })
+  document.getElementById("strongIA").addEventListener('click', function() {
+    window.location = "/play/"+joueur.value+"/strongIA";
+  })
+  </script>
+</body>
+</html>
