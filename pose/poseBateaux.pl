@@ -78,6 +78,7 @@ NewTaille is -(Taille,1), NewY is +(Y, 1),
 assertz(case(Joueur, X, Y, 0, IdShip)),
 assertShip(IdShip, NewTaille, 1, X, NewY, Joueur).
 
+
 displayGrid(Joueur) :- case(Joueur,X,Y,T,ID), writeln([X, Y, T, '"',ID, '"']), fail.
 
 displayPlayer(Joueur) :- not(displayGrid(Joueur)), write('end').
