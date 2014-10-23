@@ -69,7 +69,7 @@ ships(marco,6,9,0,patrol).
 ships(marco,6,10,0,patrol).
 */
 
-/*
+
 ships(strongIA1,1,1,0,battleship).
 ships(strongIA1,1,2,0,battleship).
 ships(strongIA1,1,3,0,battleship).
@@ -100,6 +100,7 @@ ships(strongIA2,7,3,0,destroyer).
 ships(strongIA2,9,1,0,patrol).
 ships(strongIA2,9,2,0,patrol).
 
+/*
 ships(easyIA1,1,1,0,battleship).
 ships(easyIA1,1,2,0,battleship).
 ships(easyIA1,1,3,0,battleship).
