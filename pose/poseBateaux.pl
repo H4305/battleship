@@ -57,7 +57,6 @@ checkCase(NewTaille, 1, Xplus, Y, Joueur).
 checkCase(0, _, _, _, _):- !.
 
 checkCase(Taille, 0, X, Y, Joueur):-
-writeln(Y),
 not(case(Joueur, X, Y, _, _)),
 NewTaille is -(Taille,1), NewX is +(X, 1),
 checkCase(NewTaille, 0, NewX, Y, Joueur).
@@ -78,7 +77,6 @@ assertShip(IdShip, Taille, 1, X, Y, Joueur):-
 NewTaille is -(Taille,1), NewY is +(Y, 1),
 assertz(case(Joueur, X, Y, 0, IdShip)),
 assertShip(IdShip, NewTaille, 1, X, NewY, Joueur).
-
 
 displayGrid(Joueur) :- case(Joueur,X,Y,T,ID), writeln([X, Y, T, '"',ID, '"']), fail.
 
