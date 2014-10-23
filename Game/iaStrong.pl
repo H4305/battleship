@@ -22,9 +22,9 @@ shots(joueur1, 2, 10, 0). */
 
 :- dynamic hitShip/4.
 
-shots(JOUEURTEST, 0,0,0).
+shots(_, 0,0,0).
 
-displaySuccessfulShots(Joueur, X, Y) :- shots(Joueur, X, Y, 1), write([Joueur, X, Y]), nl, fail.
+displaySuccessfulShots(Player, X, Y) :- shots(Player, X, Y, 1), write([Player, X, Y]), nl, fail.
 
 getCross(1,1, [coord(1, 2), coord(2, 1)]) :- !.
 getCross(1,10, [coord(1, 9), coord(2, 10)]) :- !.
@@ -51,58 +51,57 @@ getLine(Reussi, Potential) :-
 	X20 is min(X1,X2), X21 is X20-1, X22 is X20-2, X23 is X20-3,
 	Potential = [coord(X11, Y1), coord(X12, Y1), coord(X13, Y1), coord(X21, Y1), coord(X22, Y1), coord(X23, Y1)].
 
-potentialShot(Joueur, Potential) :- 
-	hitShip(Joueur, Reussi, _, 0), 
+potentialShot(Player, Potential) :- 
+	hitShip(Player, Reussi, _, 0), 
 	length(Reussi, Length),
 	Length > 1,
-	[coord(X,Y) |_] = Reussi, 
 	getLine(Reussi, Potential),
-	retract(hitShip(Joueur, Reussi, _, 0)),
-	assertz(hitShip(Joueur, Reussi, Potential, 0)).
+	retract(hitShip(Player, Reussi, _, 0)),
+	assertz(hitShip(Player, Reussi, Potential, 0)).
 	
 /* Si liste de hitShip == 1 alors on n'a pas la direction, on met a jour la liste des coups potentitials avec les 4 cases autours du coup precedemment reussi */
-potentialShot(Joueur, Potential) :- 
-	hitShip(Joueur, Reussi, _, 0), 
+potentialShot(Player, Potential) :- 
+	hitShip(Player, Reussi, _, 0), 
 	length(Reussi, 1),
 	[coord(X,Y) |_] = Reussi, 
 	getCross(X,Y,Potential),
-	retract(hitShip(Joueur, Reussi, _, 0)),
-	assertz(hitShip(Joueur, Reussi, Potential, 0)).
+	retract(hitShip(Player, Reussi, _, 0)),
+	assertz(hitShip(Player, Reussi, Potential, 0)).
 	
-potentialShot(Joueur, Potential) :- 
-	not(hitShip(Joueur, Reussi, _, 0)),
-	randomlyplay(Joueur, X, Y),
+potentialShot(Player, Potential) :- 
+	not(hitShip(Player, _, _, 0)),
+	randomlyplay(Player, X, Y),
 	Potential = [coord(X, Y)].
 	
-	%retract(hitShip(Joueur, Reussi, _, 0)),
-	%assertz(hitShip(Joueur, Reussi, [coord(X,Y)], 0)).
+	%retract(hitShip(Player, Reussi, _, 0)),
+	%assertz(hitShip(Player, Reussi, [coord(X,Y)], 0)).
 
-randomlyplay(Joueur, X, Y) :-
+randomlyplay(Player, X, Y) :-
 	random(1, 11, X), random(1, 11, Y),
-	not(shots(Joueur, X, Y, _)) -> true; 
-	randomlyplay(Joueur, X, Y).	
+	not(shots(Player, X, Y, _)) -> true; 
+	randomlyplay(Player, X, Y).	
 	
-computeCoordinate(Joueur, X, Y) :- 
-	potentialShot(Joueur, Potential), 
-	findShot(Joueur, Potential, X, Y),
+computeCoordinate(Player, X, Y) :- 
+	potentialShot(Player, Potential), 
+	findShot(Player, Potential, X, Y),
 	!.
 	
-findShot(Joueur, [coord(A,B)|T], X, Y) :- 
-	shots(Joueur, A, B, _), 
-	findShot(Joueur, T, X, Y),!.
+findShot(Player, [coord(A,B)|T], X, Y) :- 
+	shots(Player, A, B, _), 
+	findShot(Player, T, X, Y),!.
 
-findShot(Joueur, [coord(X,Y)|T], X, Y) :- 
-	not(shots(Joueur, X, Y, _)),!.
+findShot(Player, [coord(X,Y)|_], X, Y) :- 
+	not(shots(Player, X, Y, _)),!.
 	
-state(Joueur, X, Y, Sunk) :- 
-	hitShip(Joueur, Success, P, 0),
+state(Player, X, Y, Sunk) :- 
+	hitShip(Player, Success, P, 0),
 	append([coord(X,Y)],Success, NewSuccess),
-	retract(hitShip(Joueur, Success, P, 0)),
-	assertz(hitShip(Joueur,NewSuccess, P, Sunk)).
+	retract(hitShip(Player, Success, P, 0)),
+	assertz(hitShip(Player,NewSuccess, P, Sunk)).
 	
-state(Joueur, X, Y, Sunk) :- 
-	not(hitShip(Joueur, R, P, 0)),
-	assertz(hitShip(Joueur,[coord(X,Y)], [], Sunk)).
+state(Player, X, Y, Sunk) :- 
+	not(hitShip(Player, _, _, 0)),
+	assertz(hitShip(Player,[coord(X,Y)], [], Sunk)).
 	
-playStrongIA(Joueur, X, Y) :- computeCoordinate(Joueur,X,Y).
+playStrongIA(Player, X, Y) :- computeCoordinate(Player,X,Y).
 	

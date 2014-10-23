@@ -2,21 +2,6 @@
    0 - Horizontale
    1 - Verticale
 */
-:- abolish(ships/5).
-
-:-dynamic joueur/1.
-joueur(vadim).
-joueur(maria).
-
-:-dynamic ships/5.
-
-:-dynamic ship/2.
-ship(aircraft, 4).
-ship(battleship, 4).
-ship(submarine, 3).
-ship(destroyer, 3).
-ship(patrol, 2).
-
 
 placeShipManual(Player, IdShip, Taille, X, Y , Direction):-
 checkCase(Taille,Direction, X, Y, Player) -> assertShip(IdShip, Taille, Direction, X, Y, Player), true; 
@@ -79,10 +64,8 @@ assertz(ships(Player, X, Y, 0, IdShip)),
 assertShip(IdShip, NewTaille, 1, X, NewY, Player).
 
 
-displayGrid(Player) :- ships(Player,X,Y,T,ID), writeln([X, Y, T, '"',ID, '"']), fail.
+displayGrid(Player) :- ships(Player,X,Y,T,ID), write('PLACE:'), writeln([X, Y, T, '"',ID, '"']), fail.
 
-displayPlayer(Player) :- not(displayGrid(Player)), write('end').
-
-displayGame :- joueur(Player), write(Player), nl,displayGrid(Player), nl.
+displayPlayer(Player) :- not(displayGrid(Player)), write('END:').
 
 go :- placeShipsAuto, displayGame.
