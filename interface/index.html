@@ -30,6 +30,7 @@
   </table>
   
   <div id="boatlist" class="boatlist"></div>
+  <script src="/socket.io/socket.io.js"></script>
   <script>
     var boatsTable = document.getElementById("boats-table");
     var boatlist = document.getElementById("boatlist");
@@ -162,7 +163,6 @@
     }
 
     function updateTable(id, direction, size, X, Y) {
-
       if(direction == "vertical") {
         for(var i = Y-1; i < (Y-1+size); i++) {
           if(cases[i][X-1] != ""  && cases[i][X-1] != id) {
@@ -171,7 +171,7 @@
         }
       } else {
         for(var i = X-1; i < (X-1+size); i++) {
-          if(cases[Y-1][i] != "" && cases[i][X-1] != id) {
+          if(cases[Y-1][i] != "" && cases[Y-1][i] != id) {
             return false;
           }
         }
@@ -221,13 +221,20 @@
         boatObj.direction = (boatObj.direction == "horizontal") ? "vertical" : "horizontal";
         if(boatObj.direction == "vertical")
           boat.classList.remove("horizontal");
+        console.log("nope");
         return false;
       }
+      console.log("rotaaaate");
       boatObj.X = X;
       boatObj.Y = Y;
       document.getElementById(X+"x"+Y).appendChild(boat);
     }
 
+    var socket = io.connect('http://localhost:3000');
+    socket.on('news', function (data) {
+      console.log(data);
+      socket.emit('my other event', { my: 'data' });
+    });
   </script>
 </body>
 </html>
