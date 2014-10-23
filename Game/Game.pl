@@ -1,3 +1,4 @@
+/* Dynamic declaration of a predicate who contais 
 :-dynamic shots/4.
 
 /* Load IA */
@@ -7,11 +8,14 @@
 /* Load automatic ships disposition */
 :-consult('shipsDispositionWithBordures.pl').
 
-:-dynamic firstPlayer/1.  /* FirstPlayer */
+/* FirstPlayer : */
+:-dynamic firstPlayer/1.
 
-:-dynamic secondPlayer/1. /* SecondPlayer */
+/* SecondPlayer */
+:-dynamic secondPlayer/1. 
 
-:-dynamic currentPlayer/1. /* CurrentPlayer */
+/* CurrentPlayer */
+:-dynamic currentPlayer/1. 
 currentPlayer(noPlayer).
 
 /* addPlayer(PlayerName) : */
@@ -54,7 +58,8 @@ ship(patrol, 2).
 /* shots(Player, X, Y, Result) - Player s shots */ 
 
 :-dynamic ships/5.
-/*ships(marco,1,1,0,battleship).
+/* FOR TEST PURPOSE ONLY
+ships(marco,1,1,0,battleship).
 ships(marco,1,2,0,battleship).
 ships(marco,1,3,0,battleship).
 ships(marco,1,1,0,aircraft).
@@ -126,9 +131,6 @@ ships(easyIA2,9,1,0,patrol).
 ships(easyIA2,9,2,0,patrol).
 */
 
-
-shots(marco, 1,3, touched). /* FOR TEST PURPOSE ONLY */
-
 /* findOpponentPlayer(OpponentPlayer) : */
 findOpponentPlayer(OpponentPlayer) :- currentPlayer(PlayerName), firstPlayer(FirstPlayerName), secondPlayer(SecondPlayerName), 
 ( PlayerName == FirstPlayerName -> OpponentPlayer=SecondPlayerName ; OpponentPlayer=FirstPlayerName).
@@ -152,7 +154,7 @@ shot(X,Y) :- nl, currentPlayer(PlayerName), findOpponentPlayer(OpponentPlayer), 
 ( not(shots(PlayerName, X, Y, _)) -> ( ships(OpponentPlayer, X, Y, _, ShipName) -> addPositiveShot(PlayerName, OpponentPlayer, X, Y, ShipName), 
 displayPositiveShotMessage(X, Y), 
 ( sunken(OpponentPlayer, ShipName) -> displaySunkenBoatMessage(OpponentPlayer, ShipName), state(PlayerName, X, Y, 1), write('SHOT:'), write(PlayerName), write('.S.'), not(displayShipPosition(OpponentPlayer, ShipName)), nl, (testVictoryAgainst(OpponentPlayer) -> 
-	 write('WON.'), write(PlayerName), displayVictoryMessage(PlayerName) ; nextPlay(PlayerName) ) ; state(PlayerName, X, Y, 0) , write('SHOT:'), write(PlayerName), write('.T.'), write([X,Y]), nl, nextPlay(PlayerName) ) ; assertz(shots(PlayerName, X, Y, water)), 
+	 write('WON.'), write(PlayerName), nl, displayVictoryMessage(PlayerName) ; nextPlay(PlayerName) ) ; state(PlayerName, X, Y, 0) , write('SHOT:'), write(PlayerName), write('.T.'), write([X,Y]), nl, nextPlay(PlayerName) ) ; assertz(shots(PlayerName, X, Y, water)), 
 write('Sorry! :( No boat  at coordinates '), write([X,Y]), nl, write('SHOT:'), write(PlayerName), write('.W.'), write([X,Y]), nl, affectCurrentPlayer(OpponentPlayer) , nextPlay(OpponentPlayer) ); 
 write('Already Bombed! Try other coordinates!'), nl , nextPlay(PlayerName) ).
 

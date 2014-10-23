@@ -1,27 +1,6 @@
-/*
-shots(joueur1, 1, 1, 0).
-shots(joueur1, 1, 2, 0).
-shots(joueur1, 1, 3, 0).
-shots(joueur1, 1, 4, 0).
-shots(joueur1, 1, 5, 0).
-shots(joueur1, 1, 6, 0).
-shots(joueur1, 1, 7, 0).
-shots(joueur1, 1, 8, 0).
-shots(joueur1, 1, 9, 0).
-shots(joueur1, 1, 10, 0).
-shots(joueur1, 2, 5, 0).
-shots(joueur1, 2, 6, 1).
-shots(joueur1, 2, 7, 1).
-shots(joueur1, 3, 1, 0).
-shots(joueur1, 2, 8, 1).
-shots(joueur1, 2, 9, 0).
-shots(joueur1, 2, 10, 0). */
-
-
-
-
 :- dynamic hitShip/4.
 
+/* FOR TEST PURPOSE ONLY */
 shots(_, 0,0,0).
 
 displaySuccessfulShots(Player, X, Y) :- shots(Player, X, Y, 1), write([Player, X, Y]), nl, fail.
