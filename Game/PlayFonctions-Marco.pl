@@ -151,9 +151,9 @@ displaySunkenBoatMessage(PlayerName, ShipName) :- write('OHHHOHHHH!'), write(Pla
 shot(X,Y) :- nl, currentPlayer(PlayerName), findOpponentPlayer(OpponentPlayer), write(PlayerName), write(' is attacking '), write(OpponentPlayer), write(', and...'), nl,
 ( not(shots(PlayerName, X, Y, _)) -> ( ships(OpponentPlayer, X, Y, _, ShipName) -> addPositiveShot(PlayerName, OpponentPlayer, X, Y, ShipName), 
 displayPositiveShotMessage(X, Y), 
-( sunken(OpponentPlayer, ShipName) -> displaySunkenBoatMessage(OpponentPlayer, ShipName), state(PlayerName, X, Y, 1), write([X,Y]), nl, write('SHOT:'), write([X,Y]), write('.W'), nl, (testVictoryAgainst(OpponentPlayer) -> 
-	displayVictoryMessage(PlayerName) ; nextPlay(PlayerName) ) ; state(PlayerName, X, Y, 0) , write('SHOT:'), write([X,Y]), write('.T'), nl, nextPlay(PlayerName) ) ; assertz(shots(PlayerName, X, Y, water)), 
-write('Sorry! :( No boat  at coordinates '), write([X,Y]), nl, write('SHOT:'), write([X,Y]), write('.W'), nl, affectCurrentPlayer(OpponentPlayer) , nextPlay(OpponentPlayer) ); 
+( sunken(OpponentPlayer, ShipName) -> displaySunkenBoatMessage(OpponentPlayer, ShipName), state(PlayerName, X, Y, 1), write('SHOT:'), write(PlayerName), write('.S.'), not(displayShipPosition(OpponentPlayer, ShipName)), nl, (testVictoryAgainst(OpponentPlayer) -> 
+	displayVictoryMessage(PlayerName), write('WON.'), write(PlayerName) ; nextPlay(PlayerName) ) ; state(PlayerName, X, Y, 0) , write('SHOT:'), write(PlayerName), write('.'), write([X,Y]), write('.T'), nl, nextPlay(PlayerName) ) ; assertz(shots(PlayerName, X, Y, water)), 
+write('Sorry! :( No boat  at coordinates '), write([X,Y]), nl, write('SHOT:'), write(PlayerName), write('.'), write([X,Y]), write('.W'), nl, affectCurrentPlayer(OpponentPlayer) , nextPlay(OpponentPlayer) ); 
 write('Already Bombed! Try other coordinates!'), nl , nextPlay(PlayerName) ).
 
 /* nextPlay(IAPlayer) : Tests if the next player is an IA and calls playIA(IAPlayer) */ 
@@ -170,6 +170,9 @@ playIAStrong(IAPlayer) :- playStrongIA(IAPlayer, X, Y), shot(X,Y).
 
 /* displayGrid :  it displays player's ships */
 displayGrid :- currentPlayer(PlayerName), ships(PlayerName,X,Y,A,B), write([PlayerName,X,Y,A,B]), nl, fail.
+
+/* displayShipPosition */
+displayShipPosition(PlayerName, ShipName) :- ships(PlayerName, X, Y, _, ShipName), write([X,Y]), write('.'), fail.
 
 /* testVictoryAgainst(Player) : it tests if Player loose (if it exists a piece of ship that has not been hitten */
 testVictoryAgainst(Player) :- not(ships(Player,_,_,0,_)).
