@@ -18,8 +18,8 @@ resetTable(enemyBoats);
 
 //App
 
-app.route('/play/:username').get(function (req, res, next){
-  res.render('play', {playerName: req.params.username});
+app.route('/play/:username/:ia').get(function (req, res, next){
+  res.render('play', {playerName: req.params.username, iaName: req.params.ia});
 });
 
 app.engine('mustache', mustacheExpress());
@@ -40,15 +40,16 @@ var server = app.listen(3000, function () {
 });
 
 var io = socketio(server);
-
-io.on('connection', function (socket) {
+var socket;
+io.on('connection', function (sock) {
+  socket = sock;
   socket.emit('news', { hello: 'world' });
   socket.on('my other event', function (data) {
     console.log(data);
   });
   socket.on('start-game', function (data) {
-    console.log("addPlayer("+ data.player +").");
-    terminal.stdin.write("addPlayer("+ data.player +").");
+    console.log("addPlayer("+ data.player +").\n");
+    terminal.stdin.write("addPlayer("+ data.player +").\n");
     Object.keys(data.boats).forEach(function(boat) {
       var direction = data.boats[boat].direction=="vertical" ? 1 : 0;
       console.log('placeShipManual('+data.player+', '+ boat +', '+ data.boats[boat].size +', '+ data.boats[boat].X +', '+ data.boats[boat].Y +', '+direction+').\n');
@@ -56,23 +57,30 @@ io.on('connection', function (socket) {
     });
     resetTable(myBoats);
     ia = data.ia;
-    console.log("add"+ia+".");
-    terminal.stdin.write("add" + ia + ".");
+    var funcIA;
+    if(ia == "easyIA") {
+      funcIA = "addEasyIA";
+    } else {
+      funcIA = "addStrongIA";
+    }
+
+    console.log(funcIA+".\n");
+    terminal.stdin.write(funcIA + ".\n");
     setTimeout(function() {
-      console.log("displayPlayer(" + ia + ").");
+      console.log("displayPlayer(" + ia + ").\n");
       terminal.stdin.write("displayPlayer("+ia+").\n");
     }, 1000);
   });
 
   socket.on('user-shot', function (data) {
-    console.log("shot("+data.X+","+data.Y+").");
-    terminal.stdin.write("shot("+data.X+","+data.Y+").");
+    console.log("shot("+data.X+","+data.Y+").\n");
+    terminal.stdin.write("shot("+data.X+","+data.Y+").\n");
   });
 });
 
 //Terminal
 
-var args = ['-s', '../Game/PlayFonctions-Marco.pl', '-g', 'placeShipsAuto('+j1+').'];
+var args = ['-s', '../Game/Game.pl'];
 
 var terminal = require('child_process').spawn('/Applications/SWI-Prolog.app/Contents/MacOS/swipl', args);
 
@@ -91,6 +99,9 @@ terminal.stdout.on('data', function (data) {
         break;
       case 'SHOT':
         treatShot(msg);
+        break;
+      case 'WIN':
+        victoryCondition(msg);
       default:
         console.log(line);
     }
@@ -135,12 +146,12 @@ function treatShot(msg) {
   if(result == "S") {
     coords = [];
     for(var i = 2; i<array.length-1; i++) {
-      coords.push = JSON.parse(array[i]);
+      coords.push(JSON.parse(array[i]));
     }
   } else {
     coords = JSON.parse(array[2]);
   }
-
+  console.log(msg);
   if(player == "strongIA1" ||
      player == "strongIA2" ||
      player == "easyIA1"   ||
@@ -162,6 +173,17 @@ function resetTable(table) {
     table[i] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
   }
 };
+
+function victoryCondition(msg) {
+  if(msg == "strongIA1" ||
+     msg == "strongIA2" ||
+     msg == "easyIA1"   ||
+     msg == "easyIA2"   ) {
+    socket.emit('lost');
+  } else {
+    socket.emit('won');
+  }
+}
 
 function printTable(table) {
   var p = '';
