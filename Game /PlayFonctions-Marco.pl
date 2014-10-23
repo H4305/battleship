@@ -151,7 +151,7 @@ shot(X,Y) :- nl, currentPlayer(PlayerName), findOpponentPlayer(OpponentPlayer), 
 ( not(shots(PlayerName, X, Y, _)) -> ( ships(OpponentPlayer, X, Y, _, ShipName) -> addPositiveShot(PlayerName, OpponentPlayer, X, Y, ShipName), 
 displayPositiveShotMessage(X, Y), 
 ( sunken(OpponentPlayer, ShipName) -> displaySunkenBoatMessage(OpponentPlayer, ShipName), state(PlayerName, X, Y, 1), (testVictoryAgainst(OpponentPlayer) -> 
-	displayVictoryMessage(PlayerName) ; nextPlay(PlayerName) ) ; state(PlayerName, X, Y, 0) , nextPlay(PlayerName) ) ; assertz(shots(PlayerName, X, Y, water)), 
+	displayVictoryMessage(PlayerName) ; nextPlay(PlayerName) ) ; state(PlayerName, X, Y, 0) , write('SHOT:'), write([X,Y]), write(',T'), nl,  nextPlay(PlayerName) ) ; assertz(shots(PlayerName, X, Y, water)), 
 write('Sorry! :( No boat  at coordinates '), write([X,Y]), nl, affectCurrentPlayer(OpponentPlayer) , nextPlay(OpponentPlayer) ); 
 write('Already Bombed! Try other coordinates!'), nl , nextPlay(PlayerName) ).
 
