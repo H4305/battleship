@@ -3,19 +3,34 @@
 <head>
   <meta charset="UTF-8">
   <title>Bataille Navale</title>
-  <link rel="stylesheet" href="style/normalize.css">
-  <link rel="stylesheet" href="style/main.css">
+  <link rel="stylesheet" href="/style/normalize.css">
+  <link rel="stylesheet" href="/style/main.css">
 </head>
 <body>
   <h1>Bataille Navale</h1>
-  <h2>Joueur: {{nomJoueur}}</h2>
+  <h2>Joueur: {{playerName}}</h2>
 <div class="controllers">
   <button id="start">Start</button>
 </div>
   <div id="boatboard" class="boatboard">
-    <img src="img/shot.png" alt="" class="shot">
+    <img src="/img/shot.png" alt="" class="shot">
   </div>
   <table id="boats-table" colspace="0">
+    <tr>
+      <th></th>
+      <th>A</th>
+      <th>B</th>
+      <th>C</th>
+      <th>D</th>
+      <th>E</th>
+      <th>F</th>
+      <th>G</th>
+      <th>H</th>
+      <th>I</th>
+      <th>J</th>
+    </tr>
+  </table>
+  <table id="shots-table" colspace="0">
     <tr>
       <th></th>
       <th>A</th>
@@ -33,20 +48,34 @@
   <div id="boatlist" class="boatlist"></div>
   <script src="/socket.io/socket.io.js"></script>
   <script>
+    var player = "{{playerName}}";
     var boatsTable = document.getElementById("boats-table");
+    var shotsTable = document.getElementById("shots-table");
     var boatlist = document.getElementById("boatlist");
     var boatboard = document.getElementById("boatboard");
     var startBtn = document.getElementById("start");
 
     var socket = io.connect('http://localhost:3000');
     socket.on('news', function (data) {
-      console.log(data);
-      socket.emit('my other event', { my: 'data' });
+      socket.emit('my other event', { name: 'data' });
     });
 
     startBtn.addEventListener('click', function(event) {
-      console.log("piwww");
-      socket.emit('gogogo');
+      var coordsSet = false;
+      boats.forEach(function(name, obj) {
+        if(obj.X === undefined ||
+           obj.Y === undefined) {
+          coordsSet = name;
+        }
+      });
+      if(coordsSet) {
+        alert('Boat not set: ' + coordsSet);
+        return;
+      }
+      socket.emit('start-game', {
+        player: player,
+        boats: boats
+      });
     });
 
     var boats = {
@@ -93,10 +122,25 @@
       boatsTable.appendChild(row);
     }
 
+    for(var r=1;r<11;r++) {
+      var row = document.createElement('tr');
+      var rowId = document.createElement('th');
+      rowId.textContent = r;
+      row.appendChild(rowId);
+      for(var c=1;c<11;c++) {
+        var cell = document.createElement('td');
+        cell.id = "s"+c+'x'+r;
+        cell.dataset.X = c;
+        cell.dataset.Y = r;
+        row.appendChild(cell);
+      }
+      shotsTable.appendChild(row);
+    }
+
 
     boats.forEach(function(name, obj) {
       var boat = document.createElement('img');
-      boat.src = "img/"+name+".png";
+      boat.src = "/img/"+name+".png";
       boat.id = name;
       boat.draggable = true;
       boat.classList.add("boat");

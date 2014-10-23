@@ -1,3 +1,4 @@
+var path = require('path');
 var express = require('express');
 var app = express();
 
@@ -8,14 +9,18 @@ var j1 = "bernardo";
 var j2;
 
 var cases = [];
-for(var i = 0; i<10;i++) {
-  cases[i] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-}
+
+function clearTable() {
+  for(var i = 0; i<10;i++) {
+    cases[i] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+  }
+};
+clearTable();
 
 //App
 
-app.get('/', function(req, res){
-  res.render('play', {nomJoueur: "Modou"});
+app.route('/play/:username').get(function (req, res, next){
+  res.render('play', {playerName: req.params.username});
 });
 
 app.engine('mustache', mustacheExpress());
@@ -23,6 +28,7 @@ app.engine('mustache', mustacheExpress());
 app.set('view engine', 'mustache');
 app.set('views', __dirname + '/views');
 app.use(express.static('public'));
+
 //Socket
 
 var server = app.listen(3000, function () {
@@ -41,9 +47,21 @@ io.on('connection', function (socket) {
   socket.on('my other event', function (data) {
     console.log(data);
   });
-  socket.on('gogogo', function () {
-    console.log("STAAAAAARRRRRTTTTTTT!!!!!!");
-  })
+  socket.on('start-game', function (data) {
+    console.log(data.player);
+    console.log(data.boats);
+    Object.keys(data.boats).forEach(function(boat) {
+      var direction = data.boats[boat].direction=="vertical" ? 1 : 0;
+      console.log('placeShipManual('+data.player+', '+ boat +', '+ data.boats[boat].size +', '+ data.boats[boat].X +', '+ data.boats[boat].Y +', '+direction+').\n');
+      terminal.stdin.write('placeShipManual('+data.player+', '+ boat +', '+ data.boats[boat].size +', '+  data.boats[boat].X +', '+ data.boats[boat].Y +', '+direction+').\n');
+    });
+    clearTable();
+    setTimeout(function() {
+      console.log("displayPlayer(" + data.player + ").\n");
+      terminal.stdin.write("displayPlayer(" + data.player + ").\n");
+      terminal.stdin.write("displayPlayer(" + data.player + ").\n");
+    }, 5000);
+  });
 });
 
 //Terminal
@@ -61,15 +79,16 @@ terminal.stdout.on('data', function (data) {
         printTable();
         break;
       default:
+        console.log(line);
         lineDefault(line);
     }
   });
 });
-/*
+
 terminal.stderr.on('data', function (data) {
     console.log('stderr: ' + data);
 });
-*/
+
 terminal.on('exit', function (code) {
     console.log('child process exited with code ' + code);
 });

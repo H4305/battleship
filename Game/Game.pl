@@ -5,7 +5,7 @@
 :-consult('iaStrong').
 
 /* Load automatic ships disposition */
-:-consult('poseBateauxAvecBords.pl').
+:-consult('shipsDispositionWithBordures.pl').
 
 :-dynamic firstPlayer/1.  /* FirstPlayer */
 

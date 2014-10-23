@@ -57,7 +57,6 @@ checkCase(NewTaille, 1, Xplus, Y, Joueur).
 checkCase(0, _, _, _, _):- !.
 
 checkCase(Taille, 0, X, Y, Joueur):-
-writeln(Y),
 not(case(Joueur, X, Y, _, _)),
 NewTaille is -(Taille,1), NewX is +(X, 1),
 checkCase(NewTaille, 0, NewX, Y, Joueur).
