@@ -18,6 +18,12 @@ th {
   background:#fff;
 }
 
+h3 {
+  position: relative;
+  width: 360px;
+  float: left;
+  margin-left: 60px;
+}
 
 .boat {
   position:absolute;
@@ -36,6 +42,7 @@ th {
 .boatboard {
   position: relative;
   left: 30px;
+  clear:both;
 }
 
 .boatlist {
@@ -53,4 +60,20 @@ th {
   position:absolute;
   width:32px;
   height:32px;
+}
+
+.case-load {
+  background:rgba(200,200,200,0.5);
+}
+
+.case-shot {
+  background:rgba(255,0,0,0.5);
+}
+
+.case-water {
+  background:rgba(0,0,255,0.9);
+}
+
+.case-sink {
+  background:rgba(0,0,0,0.5);
 }
