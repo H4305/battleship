@@ -1,13 +1,16 @@
-shots(joueur1, 1, 1, 0).
-shots(joueur1, 1, 2, 0).
-shots(joueur1, 1, 3, 0).
-shots(joueur1, 1, 4, 0).
-shots(joueur1, 1, 5, 0).
-shots(joueur1, 1, 6, 0).
-shots(joueur1, 1, 7, 0).
-shots(joueur1, 1, 8, 0).
-shots(joueur1, 1, 9, 0).
-shots(joueur1, 1, 10, 0).
+:- dynamic shots/4.
+shots(JOUEURTEST, 0,0,0).
+
+/*34 Length of the list */
+gridlines(joueur1, 34, [coord(1, 1), coord(4, 1), coord(7, 1), coord(10, 1), coord(2, 2), coord(5, 2), coord(8, 2), coord(3, 3), coord(6, 3), coord(9, 3), coord(1, 4), coord(4, 4), coord(7, 4), coord(10, 4), coord(2, 5), coord(5, 5), coord(8, 5), coord(3, 6), coord(6, 6), coord(9, 6), coord(1, 7), coord(4, 7), coord(7, 7), coord(10, 7), coord(2, 8), coord(5, 8), coord(8, 8), coord(3, 9), coord(6, 9), coord(9, 9), coord(1, 10), coord(4, 10), coord(7, 10), coord(10, 10)]).
+
+playGrid(Joueur, X, Y) :- 
+	random(1, 35, Random),
+	gridlines(Joueur, _, ListOfPossibleShot),
+	nth1(Random, ListOfPossibleShot, coord(X, Y)),
+	/*Better idea : Remove the element of the list */
+	not(shots(Joueur, X, Y, _)) -> true; playGrid(Joueur, X, Y).
+
 
 /*
 Regle : 
