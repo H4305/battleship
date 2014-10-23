@@ -43,7 +43,9 @@ NewTaille is -(Taille,1), NewX is +(X, -(1, *(1, Direction))), NewY is +(Y, Dire
 assertz(ships(Joueur, X, Y, 0, IdShip)),
 assertShip(IdShip, NewTaille, Direction, NewX, NewY, Joueur).
 
-displayGrid(Joueur) :- ships(Joueur,X,Y,T,ID), write([Joueur, X, Y, T, ID]), nl, fail.
+displayGrid(Joueur) :- ships(Joueur,X,Y,T,ID), write('PLACE:'), write([Joueur, X, Y, T, ID]), nl, fail.
+
+displayPlayer(Joueur) :- not(displayGrid(Joueur)), write('END:').
 
 displayGame :- joueur(Joueur), write(Joueur), nl,displayGrid(Joueur),nl.
 

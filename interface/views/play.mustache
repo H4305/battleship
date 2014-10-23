@@ -8,10 +8,12 @@
 </head>
 <body>
   <h1>Bataille Navale</h1>
-  <h2>Joueur: {{playerName}}</h2>
+  <h2>{{playerName}} VS {{iaName}}</h2>
 <div class="controllers">
   <button id="start">Start</button>
 </div>
+  <h3>My board</h3>
+  <h3>AI Board</h3>
   <div id="boatboard" class="boatboard">
     <img src="/img/shot.png" alt="" class="shot">
   </div>
@@ -46,8 +48,15 @@
     </tr>
   </table>
   <div id="boatlist" class="boatlist"></div>
+  <div class="end hidden" id="loose">
+    YOU LOOSE!!!
+  </div>
+  <div class="end hidden" id="win">
+    YOU WIN!!!
+  </div>
   <script src="/socket.io/socket.io.js"></script>
   <script>
+    var ia = "{{iaName}}";
     var player = "{{playerName}}";
     var boatsTable = document.getElementById("boats-table");
     var shotsTable = document.getElementById("shots-table");
@@ -55,9 +64,43 @@
     var boatboard = document.getElementById("boatboard");
     var startBtn = document.getElementById("start");
 
+    var canShoot = true;
+
     var socket = io.connect('http://localhost:3000');
-    socket.on('news', function (data) {
-      socket.emit('my other event', { name: 'data' });
+    socket.on('won', function (data) {
+      document.getElementById('win').classList.remove("hidden");
+    });
+    socket.on('lost', function (data) {
+      document.getElementById('loose').classList.remove("hidden");
+    });
+
+    socket.on('shot-taken', function(data) {
+      if(data.result == "S") {
+        //var coords = JSON.parse(data.coords);
+        for(var i = 0; i < data.coords.length; i++) {
+          document.getElementById(data.coords[i][0]+"x"+data.coords[i][1]).classList.add("case-sink");
+        }
+      } else if(data.result == "W") {
+        document.getElementById(data.coords[0]+"x"+data.coords[1]).classList.add("case-water");
+      } else {
+        document.getElementById(data.coords[0]+"x"+data.coords[1]).classList.add("case-shot");
+      }
+      canShoot = true;
+    });
+
+    socket.on('shot-result', function(data) {
+      console.log(data);
+      if(data.result == "S") {
+        for(var i = 0; i < data.coords.length; i++) {
+          document.getElementById("s"+data.coords[i][0]+"x"+data.coords[i][1]).classList.add("case-sink");
+        }
+        canShoot = true;
+      } else if(data.result == "W") {
+        document.getElementById("s"+data.coords[0]+"x"+data.coords[1]).classList.add("case-water");
+      } else {
+        canShoot = true;
+        document.getElementById("s"+data.coords[0]+"x"+data.coords[1]).classList.add("case-shot");
+      }
     });
 
     startBtn.addEventListener('click', function(event) {
@@ -73,9 +116,22 @@
         return;
       }
       socket.emit('start-game', {
+        ia: ia,
         player: player,
         boats: boats
       });
+    });
+
+    shotsTable.addEventListener('click', function(event) {
+      var elem = event.target;
+      if(elem.tagName == 'TD' && canShoot) {
+        elem.classList.add('case-load');
+        socket.emit('user-shot', {
+          X: elem.dataset.X,
+          Y: elem.dataset.Y
+        });
+        //canShoot = false;
+      }
     });
 
     var boats = {
@@ -286,6 +342,8 @@
       boatObj.Y = Y;
       document.getElementById(X+"x"+Y).appendChild(boat);
     }
+
+
   </script>
 </body>
 </html>
