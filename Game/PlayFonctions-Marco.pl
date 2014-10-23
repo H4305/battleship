@@ -5,7 +5,7 @@
 :-consult('iaStrong').
 
 /* Load automatic ships disposition */
-:-consult('poseBateaux.pl').
+:-consult('poseBateauxAvecBords.pl').
 
 :-dynamic firstPlayer/1.  /* FirstPlayer */
 
@@ -21,11 +21,11 @@ addPlayer(PlayerName) :- ( firstPlayer(FirstPlayerName) -> ( secondPlayer(Second
 
 /* addIA(Level) */
 addEasyIA :- ( firstPlayer(FirstPlayerName) -> ( secondPlayer(SecondPlayerName) -> (write('Your players has been already created, player1 is : '), 
-	write(FirstPlayerName), write(' , and player2 is : '), write(SecondPlayerName)) ; assertz(secondPlayer(easyIA2))) ; assertz(firstPlayer(easyIA1)), 
-affectCurrentPlayer(easyIA1) ).
+	write(FirstPlayerName), write(' , and player2 is : '), write(SecondPlayerName)) ; assertz(secondPlayer(easyIA2)), placeShipsAuto(easyIA2)) ; assertz(firstPlayer(easyIA1)), 
+affectCurrentPlayer(easyIA1), placeShipsAuto(easyIA1) ).
 addStrongIA :- ( firstPlayer(FirstPlayerName) -> ( secondPlayer(SecondPlayerName) -> (write('Your players has been already created, player1 is : '), 
-	write(FirstPlayerName), write(' , and player2 is : '), write(SecondPlayerName)) ; assertz(secondPlayer(strongIA2))) ; assertz(firstPlayer(strongIA1)), 
-affectCurrentPlayer(strongIA1) ).
+	write(FirstPlayerName), write(' , and player2 is : '), write(SecondPlayerName)) ; assertz(secondPlayer(strongIA2)), placeShipsAuto(strongIA2)) ; assertz(firstPlayer(strongIA1)), 
+affectCurrentPlayer(strongIA1), placeShipsAuto(strongIA1) ).
 
 /* affectCurrentPlayer(PlayerName) : */
 affectCurrentPlayer(PlayerName) :- retract(currentPlayer(_)) , assertz(currentPlayer(PlayerName)).
@@ -64,6 +64,7 @@ ships(marco,6,9,0,patrol).
 ships(marco,6,10,0,patrol).
 */
 
+/*
 ships(strongIA1,1,1,0,battleship).
 ships(strongIA1,1,2,0,battleship).
 ships(strongIA1,1,3,0,battleship).
@@ -123,7 +124,7 @@ ships(easyIA2,7,2,0,destroyer).
 ships(easyIA2,7,3,0,destroyer).
 ships(easyIA2,9,1,0,patrol).
 ships(easyIA2,9,2,0,patrol).
-
+*/
 
 
 shots(marco, 1,3, touched). /* FOR TEST PURPOSE ONLY */
@@ -150,9 +151,9 @@ displaySunkenBoatMessage(PlayerName, ShipName) :- write('OHHHOHHHH!'), write(Pla
 shot(X,Y) :- nl, currentPlayer(PlayerName), findOpponentPlayer(OpponentPlayer), write(PlayerName), write(' is attacking '), write(OpponentPlayer), write(', and...'), nl,
 ( not(shots(PlayerName, X, Y, _)) -> ( ships(OpponentPlayer, X, Y, _, ShipName) -> addPositiveShot(PlayerName, OpponentPlayer, X, Y, ShipName), 
 displayPositiveShotMessage(X, Y), 
-( sunken(OpponentPlayer, ShipName) -> displaySunkenBoatMessage(OpponentPlayer, ShipName), state(PlayerName, X, Y, 1), (testVictoryAgainst(OpponentPlayer) -> 
-	displayVictoryMessage(PlayerName) ; nextPlay(PlayerName) ) ; state(PlayerName, X, Y, 0) , nextPlay(PlayerName) ) ; assertz(shots(PlayerName, X, Y, water)), 
-write('Sorry! :( No boat  at coordinates '), write([X,Y]), nl, affectCurrentPlayer(OpponentPlayer) , nextPlay(OpponentPlayer) ); 
+( sunken(OpponentPlayer, ShipName) -> displaySunkenBoatMessage(OpponentPlayer, ShipName), state(PlayerName, X, Y, 1), write([X,Y]), nl, write('SHOT:'), write([X,Y]), write('.W'), nl, (testVictoryAgainst(OpponentPlayer) -> 
+	displayVictoryMessage(PlayerName) ; nextPlay(PlayerName) ) ; state(PlayerName, X, Y, 0) , write('SHOT:'), write([X,Y]), write('.T'), nl, nextPlay(PlayerName) ) ; assertz(shots(PlayerName, X, Y, water)), 
+write('Sorry! :( No boat  at coordinates '), write([X,Y]), nl, write('SHOT:'), write([X,Y]), write('.W'), nl, affectCurrentPlayer(OpponentPlayer) , nextPlay(OpponentPlayer) ); 
 write('Already Bombed! Try other coordinates!'), nl , nextPlay(PlayerName) ).
 
 /* nextPlay(IAPlayer) : Tests if the next player is an IA and calls playIA(IAPlayer) */ 
