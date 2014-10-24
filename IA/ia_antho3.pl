@@ -54,11 +54,3 @@ getCoordinate(Joueur, X, Y) :-
 
 
 /*If the list is empty, call IA1 for a random number .. ? because there are still available cases */
-
-/*
-Regle : 
-	- Conserver la taille du plus gros bateau restant
-	- Et on tire en quadrillant grâce à cette taille
-	- Des que l'on touche un bateau on part sur ia_antho2
-	- Le but est de ne pas tirer au hasard et de correctement quadriller la zone
-*/	

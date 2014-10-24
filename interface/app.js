@@ -86,8 +86,9 @@ io.on('connection', function (sock) {
 
 var args = ['-s', '../Game/Game.pl'];
 
-var terminal = require('child_process').spawn('/Applications/SWI-Prolog.app/Contents/MacOS/swipl', args);
+//var terminal = require('child_process').spawn('/Applications/SWI-Prolog.app/Contents/MacOS/swipl', args);
 
+var terminal = require('child_process').spawn('C:\\Program Files\\swipl\\bin\\swipl.exe', args);
 terminal.stdout.on('data', function (data) {
   data.toString().split('\n').forEach(function (line){
     if(line.length == 0)
